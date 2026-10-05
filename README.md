@@ -8,7 +8,7 @@ After a clinician signs a prescription, the e-prescribing service reports back t
 
 ![Two panes showing the same visit's prescriptions; the left flips a failed prescription back to Sent, the right keeps it Failed and later queues it with an owner](docs/demo.gif)
 
-*One scripted, synthetic visit, the same webhook stream on both sides. Left: latest webhook wins, duplicates dropped. Right: this read model. At 17:04 the service returns an error for lamotrigine. At 19:00 that prescription's "submitted" webhook arrives for the first time (the service retried after our endpoint timed out), and the left side flips back to green "Sent". Dropping duplicates doesn't catch it, because it isn't one. After the visit ends at 20:00, the right side puts both problems in a clinic queue with an owner, a next step and an age.*
+*One scripted, synthetic visit, the same webhook stream on both sides. Times are minutes:seconds into a 20-minute visit. Left: latest webhook wins, duplicates dropped. Right: this read model. At 17:04 the service returns an error for lamotrigine. At 19:00 that prescription's "submitted" webhook arrives for the first time (the service retried after our endpoint timed out), and the left side flips back to green "Sent". Dropping duplicates doesn't catch it, because it isn't one. After the visit ends at 20:00, the right side puts both problems in a clinic queue with an owner, a next step and an age.*
 
 ## Results
 
@@ -76,7 +76,7 @@ Median time from visit close to a late confirmation: 3.6 min.
 *Seeds 0–199, 20 visits each: 8,044 synthetic prescriptions, 621 of which really failed. Fault level 10%. Pooled over all seeds.*
 <!-- /results:cost -->
 
-These numbers come straight from the invented delay and drop inputs, so read them as a method to refit on real delivery data, not as a finding. Full tables, including a fault sweep from 0% to 20%: [`results/numbers.md`](results/numbers.md).
+At these rates, more delivered prescriptions get a false issue than prescriptions really fail, so the queue would be mostly noise for the people working it. That is why the first item under "What I'd do next" is to ask the service for a prescription's current status before opening an issue. These numbers come straight from the invented delay and drop inputs, so read them as a method to refit on real delivery data, not as a finding. Full tables, including a fault sweep from 0% to 20%: [`results/numbers.md`](results/numbers.md).
 
 ## How it works
 
@@ -93,7 +93,7 @@ simulated service --webhooks: late, twice, dropped--> events (append-only, uniqu
 
 ### How it was built
 
-I built this with Claude Code, from a written spec that three review agents (a founder, a senior engineer and a scope cutter) argued over for five rounds before any code was written. The agent wrote the code, tests and scripts and ran them. Two rules in [`CLAUDE.md`](CLAUDE.md) limited what it could do: "Never edit files in `results/` by hand; regenerate them with `pnpm bench`." and "Don't change the simulator's fault model unless a test fails first." Its work was checked by the conformance test as the gate for the read model, by `pnpm verify:numbers` in CI for every committed number and README table, and by a pre-commit hook that blocks words that must not appear in the repo.
+I built this in one day with Claude Code, from a written spec that three review agents (a founder, a senior engineer and a scope cutter) argued over for five rounds before any code was written. The agent wrote the code, tests and scripts and ran them, under the rules in [`CLAUDE.md`](CLAUDE.md). Two of those rules bound its work on the results: "Never edit files in `results/` by hand; regenerate them with `pnpm bench`." and "Don't change the simulator's fault model unless a test fails first." Its work was checked by the conformance test as the gate for the read model, by `pnpm verify:numbers` in CI for every committed number and README table, and by a pre-commit hook that blocks words that must not appear in the repo. Why each design call was made, what was tried first and dropped, and what the measurements changed are in [`docs/design-notes.md`](docs/design-notes.md).
 
 ## Run it
 
@@ -127,8 +127,8 @@ To record the GIF again: `PLAYWRIGHT_BROWSERS_PATH=0 pnpm exec playwright instal
 
 ## What I'd do next
 
+- When a line goes "Not confirmed", ask the service for the prescription's current status before opening an issue, so the clinic queue only gets the ones still unknown.
 - A pharmacy picker that tells same-name stores apart by street and checks the directory before signing.
-- When a line goes "Not confirmed", ask the service for the prescription's current status before opening an issue.
 - An agent on the clinic queue that drafts the message to the patient and proposes a nearby pharmacy that takes e-prescriptions, with a person approving it.
 - Replay any seed on the compare page, and show each line's event trail on click.
 - Refit the delay model and the 90 s threshold on real delivery logs.
