@@ -4,6 +4,8 @@ By [Ahmed Sozzer](https://amsozzer.com) · [github.com/Amsozzer1](https://github
 
 A medication list for a telehealth psychiatry visit whose prescription statuses stay true when e-prescribing webhooks arrive late, twice, out of order, or not at all.
 
+**Live demo:** [readback-delta.vercel.app/compare](https://readback-delta.vercel.app/compare) (synthetic data, scripted visit)
+
 After a clinician signs a prescription, the e-prescribing service reports back through webhooks: "submitted", then "delivered" or "error". Webhook delivery is messy. A screen that shows the latest webhook to arrive, and treats "submitted" as "Sent", can show a prescription the service rejected as green "Sent". The clinician moves on to the next patient, and the patient finds out at the pharmacy counter. This project builds the screen and the read model behind it, and measures both against the simple version on a simulated service.
 
 ![Two panes showing the same visit's prescriptions; the left flips a failed prescription back to Sent, the right keeps it Failed and later queues it with an owner](docs/demo.gif)
