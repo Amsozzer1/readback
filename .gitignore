@@ -13,9 +13,20 @@ build/
 dist/
 target/
 node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
 .venv/
 __pycache__/
 *.o
+
+# Test output (Playwright reports contain absolute paths)
+test-results/
+playwright-report/
+coverage/
+*.log
 
 # Editor / OS
 .vscode/*

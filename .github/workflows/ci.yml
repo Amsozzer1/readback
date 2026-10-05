@@ -8,14 +8,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: readback
+          POSTGRES_PASSWORD: readback
+          POSTGRES_DB: readback
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U readback"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://readback:readback@localhost:5432/readback
     steps:
       - uses: actions/checkout@v4
-      # Replace with the project's toolchain setup, build and test commands.
-      # TEMPLATE.md only exists in the template repo (setup.sh deletes it), so the
-      # template itself passes and a new project fails until it sets real commands.
-      - run: |
-          if [ -f TEMPLATE.md ]; then echo "template repo, nothing to build"; exit 0; fi
-          echo "set build and test commands"; exit 1
+      # pnpm version comes from packageManager in package.json, Node from .nvmrc.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # next build first: it generates next-env.d.ts, which the typecheck reads.
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm migrate
+      - run: pnpm test
 
   leak-check:
     runs-on: ubuntu-24.04

@@ -1,0 +1,17 @@
+# Local Postgres for tests, ingest and dev. Data is throwaway (tmpfs).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: readback
+      POSTGRES_PASSWORD: readback
+      POSTGRES_DB: readback
+    ports:
+      - "54329:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U readback"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
