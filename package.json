@@ -16,7 +16,8 @@
     "test": "vitest run",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "sim": "tsx scripts/sim.ts"
   },
   "dependencies": {
     "next": "15.5.27",
