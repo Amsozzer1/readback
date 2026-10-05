@@ -3,7 +3,7 @@
 Every number in the README comes from `pnpm bench`, which writes this file, `results/raw/*.json` and the two tables in the README. Nothing here is edited by hand: `pnpm verify:numbers` reruns the bench and fails on any difference.
 
 - Command: `pnpm bench`
-- Commit: d8d6d92 (with uncommitted changes)
+- Commit: a9b34d7
 - Machine: Apple M4, darwin 25.6.0, Node v24.21.0
 - Runs: 200 seeds (0–199) × 20 visits at each fault level. Every number is an aggregate pooled over all prescriptions in those seeds, not a single run.
 - Inputs are invented, not measured from any real service: failure rate 8% of prescriptions; terminal webhook delay lognormal (median 3 s, σ 1.5, at least 1 s); at fault level f, each webhook is dropped with probability f/2, delivered late (30 s to 10 min) with probability f, and delivered twice with probability f.
