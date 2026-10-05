@@ -19,7 +19,8 @@
     "migrate": "tsx scripts/migrate.ts",
     "sim": "tsx scripts/sim.ts",
     "bench": "tsx scripts/bench.ts",
-    "verify:numbers": "tsx scripts/verify-numbers.ts"
+    "verify:numbers": "tsx scripts/verify-numbers.ts",
+    "gif": "tsx scripts/capture.ts --gif"
   },
   "dependencies": {
     "next": "15.5.27",
@@ -28,10 +29,17 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
     "@types/node": "24.19.1",
     "@types/pg": "8.23.1",
+    "@types/pngjs": "6.0.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "gifenc": "1.0.3",
+    "jsdom": "30.1.2",
+    "pngjs": "7.0.0",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vitest": "5.0.3"

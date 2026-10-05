@@ -45,7 +45,7 @@ export const ACTIONS: Record<ProblemKind, ProblemText> = {
     afterClose: { owner: "Ops", nextStep: "Fix enrollment and resend" },
   },
   not_confirmed: {
-    lineText: "Not confirmed",
+    lineText: "No delivery confirmation",
     queueText: "No delivery confirmation",
     inVisit: { owner: "Ops", nextStep: "Call the pharmacy to confirm it arrived" },
     afterClose: { owner: "Ops", nextStep: "Call the pharmacy to confirm it arrived" },

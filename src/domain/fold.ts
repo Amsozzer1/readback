@@ -83,6 +83,8 @@ export interface Line {
   reason: string | null;
   /** When the first error arrived, if the line shows Failed. */
   errorAtMs: number | null;
+  /** When the line became "Not confirmed", if it shows that. */
+  notConfirmedSinceMs: number | null;
   nextStep: string | null;
   issue: Issue | null;
 }
@@ -174,6 +176,7 @@ export function view(state: OrderState, atMs: number, rules: Rules, staleAfterMs
     category: status === "failed" ? category : null,
     reason: text ? text.lineText : null,
     errorAtMs: status === "failed" ? state.firstErrorArrivedMs : null,
+    notConfirmedSinceMs: status === "not_confirmed" ? state.signedMs + staleAfterMs : null,
     nextStep: rules.issues && text ? (closed ? text.afterClose.nextStep : text.inVisit.nextStep) : null,
     issue,
   };

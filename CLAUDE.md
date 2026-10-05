@@ -9,8 +9,9 @@ Planning docs live in `.private/` (gitignored): `PRD.md` is the spec to build, `
 - Install: `pnpm install` (Node version in `.nvmrc`, pnpm version in `package.json`)
 - Build: `pnpm build`
 - Test: `pnpm db:up && pnpm migrate && pnpm test` (Postgres 16 in Docker on port 54329)
-- Run the demo: `[command]`
-- Measure / regenerate results: `[command]`
+- Run the demo: `pnpm dev`, then open http://localhost:3000/compare
+- Measure / regenerate results: `pnpm bench` (writes `results/` and the README tables); `pnpm verify:numbers` checks them
+- Record the GIF: `pnpm build && pnpm gif` (first time: `PLAYWRIGHT_BROWSERS_PATH=0 pnpm exec playwright install chromium`)
 
 ## How to work
 - Build milestone by milestone from `.private/PRD.md`. Don't skip acceptance checks.
