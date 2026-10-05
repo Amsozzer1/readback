@@ -1,7 +1,7 @@
 {
   "meta": {
     "command": "pnpm bench",
-    "commit": "228863d",
+    "commit": "d8d6d92 (with uncommitted changes)",
     "machine": "Apple M4, darwin 25.6.0, Node v24.21.0"
   },
   "fault": 0.2,

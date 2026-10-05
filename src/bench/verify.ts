@@ -1,7 +1,7 @@
 // The comparison behind `pnpm verify:numbers`, separated from disk access so tests can
 // feed it edited copies and check it notices.
 
-import { isMetaLine, numbersMd, rawFileName, rawJson, readBlock, readmeAblation, readmeHeadline } from "./render";
+import { isMetaLine, numbersMd, rawFileName, rawJson, readBlock, readmeBlocks } from "./render";
 import type { FaultResult } from "./run";
 
 export interface CommittedFiles {
@@ -48,7 +48,7 @@ export function verifyNumbers(results: FaultResult[], files: CommittedFiles): st
     problems.push(`results/numbers.md differs, ${firstDiff(withoutMeta(files.numbersMd), expectedMd)}`);
   }
 
-  for (const [block, expected] of [["headline", readmeHeadline(results)], ["ablation", readmeAblation(results)]] as const) {
+  for (const [block, expected] of readmeBlocks(results)) {
     const committed = readBlock(files.readme, block);
     if (committed === null) problems.push(`README.md has no ${block} results block`);
     else if (committed !== expected) problems.push(`README.md ${block} table differs, ${firstDiff(committed, expected)}`);

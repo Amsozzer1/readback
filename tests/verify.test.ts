@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { numbersMd, rawFileName, rawJson, readmeAblation, readmeHeadline } from "@/bench/render";
+import { numbersMd, rawFileName, rawJson, readmeBlocks, README_BLOCKS } from "@/bench/render";
 import { runBench } from "@/bench/run";
 import { verifyNumbers, type CommittedFiles } from "@/bench/verify";
 
@@ -9,8 +9,9 @@ const meta = { command: "pnpm bench", commit: "abc1234", machine: "Test CPU, lin
 function committed(): CommittedFiles {
   return {
     readme: [
-      "# Title", "", "<!-- results:headline -->", readmeHeadline(results), "<!-- /results:headline -->", "",
-      "<!-- results:ablation -->", readmeAblation(results), "<!-- /results:ablation -->", "",
+      "# Title",
+      ...readmeBlocks(results).flatMap(([block, content]) => ["", README_BLOCKS[block][0], content, README_BLOCKS[block][1]]),
+      "",
     ].join("\n"),
     numbersMd: numbersMd(results, meta),
     raw: Object.fromEntries(results.map((r) => [rawFileName(r.fault), rawJson(r, meta)])),
@@ -51,6 +52,12 @@ describe("verify:numbers", () => {
     const [a, b] = ["| Latest event wins | 13.3 |", "| Latest event wins, duplicates dropped | 11.6 |"];
     swapped.readme = swapped.readme.replace(a, "@@A@@").replace(b, a).replace("@@A@@", b);
     expect(verifyNumbers(results, swapped).length).toBeGreaterThan(0);
+  });
+
+  test("fails after a hand edit to the cost table", () => {
+    const files = committed();
+    files.readme = files.readme.replace("| 90 s | ", "| 90 s | 1");
+    expect(verifyNumbers(results, files).join("\n")).toMatch(/README\.md cost table differs/);
   });
 
   test("fails when a results block or raw file is missing", () => {

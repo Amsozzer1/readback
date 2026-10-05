@@ -3,7 +3,7 @@
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { collectMeta } from "../src/bench/meta";
-import { numbersMd, rawFileName, rawJson, readmeAblation, readmeHeadline, writeBlock } from "../src/bench/render";
+import { numbersMd, rawFileName, rawJson, readmeBlocks, writeBlock } from "../src/bench/render";
 import { runBench } from "../src/bench/run";
 
 const root = (p: string) => fileURLToPath(new URL(`../${p}`, import.meta.url));
@@ -18,8 +18,7 @@ for (const r of results) await writeFile(root(`results/raw/${rawFileName(r.fault
 await writeFile(root("results/numbers.md"), numbersMd(results, meta));
 
 let readme = await readFile(root("README.md"), "utf8");
-readme = writeBlock(readme, "headline", readmeHeadline(results));
-readme = writeBlock(readme, "ablation", readmeAblation(results));
+for (const [block, content] of readmeBlocks(results)) readme = writeBlock(readme, block, content);
 await writeFile(root("README.md"), readme);
 
 console.log(`bench: ${results.length} fault levels in ${((performance.now() - started) / 1000).toFixed(1)} s; wrote results/ and README tables`);

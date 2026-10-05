@@ -74,6 +74,11 @@ export function readmeAblation(results: FaultResult[]): string {
   return [metricTable(r, README_ABLATION_ROWS), "", `*${scopeLine(r)}*`].join("\n");
 }
 
+export function readmeCost(results: FaultResult[]): string {
+  const r = headlineFault(results);
+  return [costTable(r), "", `*${scopeLine(r)}*`].join("\n");
+}
+
 function costTable(r: FaultResult): string {
   const t = r.totals;
   const fa = t.falseAlarms;
@@ -155,7 +160,7 @@ ${costTable(r)}
 |---|---|---|---|---|---|
 | Headline table | Silently wrong, known failure hidden, failed with no owner, three read models | Aggregate, pooled | ${BENCH.seeds} seeds × ${BENCH.visits} visits | \`pnpm bench\` | \`results/raw/fault-${pct(r.fault).replace("%", "")}.json\` |
 | Ablation table | Same three metrics, one rule added or removed | Aggregate, pooled | ${BENCH.seeds} seeds × ${BENCH.visits} visits | \`pnpm bench\` | \`results/raw/fault-${pct(r.fault).replace("%", "")}.json\` |
-| Cost of this read model | False "Not confirmed" and false issues | Aggregate, pooled | ${BENCH.seeds} seeds × ${BENCH.visits} visits | \`pnpm bench\` | \`results/raw/fault-${pct(r.fault).replace("%", "")}.json\` |
+| Cost table | False "Not confirmed" and false issues | Aggregate, pooled | ${BENCH.seeds} seeds × ${BENCH.visits} visits | \`pnpm bench\` | \`results/raw/fault-${pct(r.fault).replace("%", "")}.json\` |
 `;
 }
 
@@ -175,10 +180,22 @@ export function isMetaLine(line: string): boolean {
 export const README_BLOCKS = {
   headline: ["<!-- results:headline -->", "<!-- /results:headline -->"],
   ablation: ["<!-- results:ablation -->", "<!-- /results:ablation -->"],
+  cost: ["<!-- results:cost -->", "<!-- /results:cost -->"],
 } as const;
 
+export type ReadmeBlock = keyof typeof README_BLOCKS;
+
+/** Every generated README block and its content for these results. */
+export function readmeBlocks(results: FaultResult[]): [ReadmeBlock, string][] {
+  return [
+    ["headline", readmeHeadline(results)],
+    ["ablation", readmeAblation(results)],
+    ["cost", readmeCost(results)],
+  ];
+}
+
 /** Returns the text between a block's markers, or null if the markers are missing. */
-export function readBlock(readme: string, block: keyof typeof README_BLOCKS): string | null {
+export function readBlock(readme: string, block: ReadmeBlock): string | null {
   const [open, close] = README_BLOCKS[block];
   const start = readme.indexOf(open);
   const end = readme.indexOf(close);
@@ -186,7 +203,7 @@ export function readBlock(readme: string, block: keyof typeof README_BLOCKS): st
   return readme.slice(start + open.length, end).replace(/^\n/, "").replace(/\n$/, "");
 }
 
-export function writeBlock(readme: string, block: keyof typeof README_BLOCKS, content: string): string {
+export function writeBlock(readme: string, block: ReadmeBlock, content: string): string {
   const [open, close] = README_BLOCKS[block];
   const start = readme.indexOf(open);
   const end = readme.indexOf(close);
