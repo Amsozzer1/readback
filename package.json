@@ -17,7 +17,9 @@
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "migrate": "tsx scripts/migrate.ts",
-    "sim": "tsx scripts/sim.ts"
+    "sim": "tsx scripts/sim.ts",
+    "bench": "tsx scripts/bench.ts",
+    "verify:numbers": "tsx scripts/verify-numbers.ts"
   },
   "dependencies": {
     "next": "15.5.27",

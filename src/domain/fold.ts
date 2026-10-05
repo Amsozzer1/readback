@@ -134,15 +134,18 @@ export function step(state: OrderState | undefined, e: RxEvent): OrderState | un
   }
 }
 
-/** What a pane shows for one prescription at `atMs`, given state built from events arrived by then. */
-export function view(state: OrderState, atMs: number, rules: Rules): Line {
+/**
+ * What a pane shows for one prescription at `atMs`, given state built from events arrived by then.
+ * `staleAfterMs` exists for the bench's threshold sweep; everything else uses the default.
+ */
+export function view(state: OrderState, atMs: number, rules: Rules, staleAfterMs = STALE_AFTER_MS): Line {
   const kind = rules.rank ? state.maxKind : state.lastKind;
   const category = rules.rank ? state.maxCategory : state.lastCategory;
 
   let status: Status;
   if (kind === "error") status = "failed";
   else if (kind === "delivered") status = "delivered";
-  else if (rules.staleness && atMs - state.signedMs >= STALE_AFTER_MS) status = "not_confirmed";
+  else if (rules.staleness && atMs - state.signedMs >= staleAfterMs) status = "not_confirmed";
   else status = rules.greenOnly ? "sending" : "sent";
 
   const problem: ProblemKind | null =
@@ -153,7 +156,7 @@ export function view(state: OrderState, atMs: number, rules: Rules): Line {
   let issue: Issue | null = null;
   if (rules.issues && text && closed) {
     const starts = [
-      rules.staleness ? state.signedMs + STALE_AFTER_MS : Infinity,
+      rules.staleness ? state.signedMs + staleAfterMs : Infinity,
       state.firstErrorArrivedMs ?? Infinity,
     ];
     issue = {
