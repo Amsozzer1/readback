@@ -20,8 +20,26 @@ if (!existsSync(root(".next/BUILD_ID"))) {
   process.exit(1);
 }
 
-const server = spawn("pnpm", ["exec", "next", "start", "-p", String(PORT)], { cwd: root("."), stdio: "ignore" });
-const stop = () => server.kill("SIGTERM");
+// Refuse to run against something already on the port: it could be a stale build.
+const already = await fetch(`http://localhost:${PORT}/`).then(() => true, () => false);
+if (already) {
+  console.error(`Port ${PORT} is already in use; stop that server first so the capture uses this build.`);
+  process.exit(1);
+}
+
+// Start next directly, in its own process group, so stopping it can't leave a server behind.
+const server = spawn(root("node_modules/.bin/next"), ["start", "-p", String(PORT)], {
+  cwd: root("."),
+  stdio: "ignore",
+  detached: true,
+});
+const stop = () => {
+  try {
+    if (server.pid) process.kill(-server.pid, "SIGTERM");
+  } catch {
+    // already gone
+  }
+};
 process.on("exit", stop);
 
 async function waitForServer(): Promise<void> {
@@ -74,7 +92,7 @@ try {
         await buttons.nth(i + 1).click();
         const to = Number(await slider.inputValue());
         for (const k of [1, 2, 3]) {
-          const v = Math.round(from + ((to - from) * k) / 4 / 1000) * 1000;
+          const v = Math.round((from + ((to - from) * k) / 4) / 1000) * 1000;
           await slider.fill(String(v));
           await shot(250);
         }

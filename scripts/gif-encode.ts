@@ -1,5 +1,8 @@
-import { applyPalette, GIFEncoder, quantize } from "gifenc";
+// gifenc is CommonJS without named-export hints, so Node's ESM loader only sees a default export.
+import gifenc from "gifenc";
 import { PNG } from "pngjs";
+
+const { applyPalette, GIFEncoder, quantize } = gifenc;
 
 /** Encodes PNG screenshots (all the same size) into an animated GIF, in pure JS. */
 export function encodeGif(frames: { png: Buffer; delayMs: number }[]): Buffer {

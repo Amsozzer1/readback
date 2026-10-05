@@ -9,4 +9,10 @@ declare module "gifenc" {
   export function GIFEncoder(): Encoder;
   export function quantize(rgba: Uint8Array | Uint8ClampedArray, maxColors: number): Palette;
   export function applyPalette(rgba: Uint8Array | Uint8ClampedArray, palette: Palette): Uint8Array;
+  const gifenc: {
+    GIFEncoder: typeof GIFEncoder;
+    quantize: typeof quantize;
+    applyPalette: typeof applyPalette;
+  };
+  export default gifenc;
 }
